@@ -3,10 +3,7 @@ package com.madkit.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.madkit.myapplication.databinding.ActivityIntroBinding
 
 class IntroActivity : AppCompatActivity() {
@@ -23,6 +20,8 @@ class IntroActivity : AppCompatActivity() {
         binding.btnSignUp.setOnClickListener {
             startActivity(Intent(this, SignUpActivity::class.java))
         }
-
+        binding.btnSignIn.setOnClickListener {
+            startActivity(Intent(this, SignInActivity::class.java))
+        }
     }
 }
