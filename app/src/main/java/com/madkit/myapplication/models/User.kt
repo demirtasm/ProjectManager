@@ -22,7 +22,7 @@ data class User(
     }
 
     override fun describeContents(): Int {
-        TODO("Not yet implemented")
+        return 0
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {

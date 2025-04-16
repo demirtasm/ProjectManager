@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.madkit.myapplication.R
 import com.madkit.myapplication.databinding.ActivitySignInBinding
+import com.madkit.myapplication.firebase.FirestoreClass
+import com.madkit.myapplication.models.User
 
 class SignInActivity  : BaseActivity() {
 
@@ -43,6 +45,7 @@ class SignInActivity  : BaseActivity() {
         }
     }
 
+
     private fun signInRegisteredUser(){
         val email:String = binding.etEmail.text.toString().trim { it <= ' ' }
         val password:String = binding.etPassword.text.toString().trim { it <= ' ' }
@@ -52,8 +55,7 @@ class SignInActivity  : BaseActivity() {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this){task->
                 hideProgressDialog()
                 if(task.isSuccessful){
-                    val user = auth.currentUser
-                    startActivity(Intent(this, MainActivity::class.java))
+                    FirestoreClass().signInUser(this)
                 }else{
                     showErrorSnackBar("Please check your login information.")
                 }
@@ -78,5 +80,9 @@ class SignInActivity  : BaseActivity() {
             }
         }
     }
-
+    fun signInSuccess(user: User){
+        hideProgressDialog()
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
 }

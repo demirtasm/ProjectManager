@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.madkit.myapplication.R
+import com.madkit.myapplication.firebase.FirestoreClass
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +20,13 @@ class SplashActivity : AppCompatActivity() {
         )
 
         Handler().postDelayed({
-            startActivity(Intent(this, IntroActivity::class.java))
+            var currentUserId = FirestoreClass().getCurrentUserId()
+            if(currentUserId.isNotEmpty()){
+                startActivity(Intent(this, MainActivity::class.java))
+
+            }else{
+                startActivity(Intent(this, IntroActivity::class.java))
+            }
             finish()
         }, 2500)
     }
