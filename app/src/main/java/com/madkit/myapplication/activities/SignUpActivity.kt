@@ -9,6 +9,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.madkit.myapplication.R
 import com.madkit.myapplication.databinding.ActivitySignUpBinding
+import com.madkit.myapplication.firebase.FirestoreClass
+import com.madkit.myapplication.models.User
 
 class SignUpActivity : BaseActivity() {
 
@@ -42,6 +44,12 @@ class SignUpActivity : BaseActivity() {
         }
     }
 
+    fun userRegisteredSuccess() {
+        hideProgressDialog()
+        FirebaseAuth.getInstance().signOut()
+        finish()
+    }
+
     private fun registerUser() {
         val name: String = binding.etName.text.toString().trim { it <= ' ' }
         val email: String = binding.etEmail.text.toString().trim { it <= ' ' }
@@ -51,12 +59,11 @@ class SignUpActivity : BaseActivity() {
             showProgressDialog(resources.getString(R.string.please_wait))
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    hideProgressDialog()
                     if (task.isSuccessful) {
                         val firebaseUser: FirebaseUser = task.result!!.user!!
                         val registeredEmail = firebaseUser.email!!
-                        FirebaseAuth.getInstance().signOut()
-                        finish()
+                        val user = User(firebaseUser.uid, name, registeredEmail)
+                        FirestoreClass().registerUser(this, user)
                     } else {
 
                     }
