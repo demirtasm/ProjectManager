@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.madkit.myapplication.R
 import com.madkit.myapplication.databinding.ActivitySignInBinding
@@ -55,7 +54,7 @@ class SignInActivity  : BaseActivity() {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this){task->
                 hideProgressDialog()
                 if(task.isSuccessful){
-                    FirestoreClass().signInUser(this)
+                    FirestoreClass().loadUserData(this)
                 }else{
                     showErrorSnackBar("Please check your login information.")
                 }

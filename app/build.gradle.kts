@@ -55,5 +55,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.firebaseui:firebase-ui-auth:9.0.0")
     implementation("com.google.firebase:firebase-firestore")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
 
 }
