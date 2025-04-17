@@ -36,7 +36,7 @@ class FirestoreClass {
             when(activity){
                 is SignInActivity ->  activity.hideProgressDialog()
                 is MainActivity -> activity.hideProgressDialog()
-
+                is MyProfileActivity->activity.hideProgressDialog()
             }
         }
     }
@@ -48,5 +48,11 @@ class FirestoreClass {
             currentUserId =currentUser.uid
         }
         return currentUserId
+    }
+
+    fun updateUserProfileData(activity: MyProfileActivity, userHashMap: HashMap<String, Any>){
+        mFireStore.collection(Constants.USERS).document(getCurrentUserId()).update(userHashMap).addOnSuccessListener {
+            activity.profileUpdateSuccess()
+        }.addOnFailureListener { e-> activity.hideProgressDialog() }
     }
 }
