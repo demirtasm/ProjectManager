@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.madkit.myapplication.R
@@ -19,6 +20,7 @@ import com.madkit.myapplication.models.User
 import de.hdodenhof.circleimageview.CircleImageView
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private lateinit var fabButton: FloatingActionButton
     private lateinit var tvUserName: TextView
     private lateinit var navUserImage: CircleImageView
     private lateinit var navView: NavigationView
@@ -36,10 +38,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toolbar = findViewById(R.id.toolbar_main_activity)
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
+        fabButton = findViewById(R.id.fab_create_board)
         val headerView = navView.getHeaderView(0)
         navUserImage = headerView.findViewById(R.id.nav_user_image)
         tvUserName = headerView.findViewById(R.id.tv_username)
         setUpActionBar()
+
+        fabButton.setOnClickListener {
+            startActivity(Intent(this, CreateBoardActivity::class.java))
+        }
         navView.setNavigationItemSelectedListener(this)
 
         FirestoreClass().loadUserData(this)
@@ -70,19 +77,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             doubleBackToExit()
         }
     }
-
-  /*  override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == Activity.RESULT_OK && requestCode == MY_PROFILE_REQUEST_CODE){
-            FirestoreClass().loadUserData(this)
-        }else{
-            Log.e("Cancelled","Cancelled")
-        }
-    }*/
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
