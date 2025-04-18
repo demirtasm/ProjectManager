@@ -1,17 +1,24 @@
 package com.madkit.myapplication.activities
 
+import android.Manifest
 import android.app.Dialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.provider.MediaStore
+import android.webkit.MimeTypeMap
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
 import com.madkit.myapplication.R
 import com.madkit.myapplication.databinding.ActivityBaseBinding
+import com.madkit.myapplication.utils.Constants
 
 open class BaseActivity : AppCompatActivity() {
 
@@ -19,6 +26,7 @@ open class BaseActivity : AppCompatActivity() {
 
     private lateinit var mProgressDialog: Dialog
     private lateinit var binding: ActivityBaseBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,5 +65,37 @@ open class BaseActivity : AppCompatActivity() {
         val snackBarView = snackBar.view
         snackBarView.setBackgroundColor(ContextCompat.getColor(this, R.color.snackbar_error_color))
         snackBar.show()
+    }
+
+    fun imageChooserForGallery(){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_GRANTED){
+                showImageChooser()
+            }else{
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_MEDIA_IMAGES), Constants.READ_STORAGE_PERMISSION_CODE)
+            }
+        }else{
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                showImageChooser()
+            } else {
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    Constants.READ_STORAGE_PERMISSION_CODE
+                )
+            }
+        }
+    }
+
+    fun showImageChooser() {
+        var galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(galleryIntent, Constants.PICK_IMAGE_REQUEST_CODE)
+    }
+
+     fun getFileExtension(uri: Uri?): String? {
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri!!))
     }
 }

@@ -20,6 +20,7 @@ import com.karumi.dexter.Dexter
 import com.madkit.myapplication.R
 import com.madkit.myapplication.databinding.ActivityMyProfileBinding
 import com.madkit.myapplication.firebase.FirestoreClass
+import com.madkit.myapplication.models.Board
 import com.madkit.myapplication.models.User
 import com.madkit.myapplication.utils.Constants
 import java.io.IOException
@@ -28,10 +29,6 @@ class MyProfileActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMyProfileBinding
 
-    companion object {
-        private const val READ_STORAGE_PERMISSION_CODE = 1
-        private const val PICK_IMAGE_REQUEST_CODE = 2
-    }
 
     private var mSelectedImageFileUri: Uri? = null
     private lateinit var mUserDetails: User
@@ -46,35 +43,7 @@ class MyProfileActivity : BaseActivity() {
         FirestoreClass().loadUserData(this)
 
         binding.ivUserImage.setOnClickListener {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.READ_MEDIA_IMAGES
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    showImageChooser()
-                } else {
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
-                        READ_STORAGE_PERMISSION_CODE
-                    )
-                }
-
-            } else {
-                if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    showImageChooser()
-                } else {
-                    ActivityCompat.requestPermissions(
-                        this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        READ_STORAGE_PERMISSION_CODE
-                    )
-                }
-            }
+            imageChooserForGallery()
 
         }
         binding.btnUpdate.setOnClickListener {
@@ -87,6 +56,7 @@ class MyProfileActivity : BaseActivity() {
         }
     }
 
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -94,7 +64,7 @@ class MyProfileActivity : BaseActivity() {
         deviceId: Int
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
-        if (requestCode == READ_STORAGE_PERMISSION_CODE) {
+        if (requestCode == Constants.READ_STORAGE_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showImageChooser()
             } else {
@@ -107,10 +77,7 @@ class MyProfileActivity : BaseActivity() {
         }
     }
 
-    fun showImageChooser() {
-        var galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST_CODE)
-    }
+
 
     override fun onActivityResult(
         requestCode: Int,
@@ -118,7 +85,7 @@ class MyProfileActivity : BaseActivity() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
+        if (resultCode == Activity.RESULT_OK && requestCode == Constants.PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
             mSelectedImageFileUri = data.data
             try {
                 Glide.with(this@MyProfileActivity).load(mSelectedImageFileUri).centerCrop()
@@ -190,9 +157,6 @@ class MyProfileActivity : BaseActivity() {
         }
     }
 
-    private fun getFileExtension(uri: Uri?): String? {
-        return MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri!!))
-    }
 
     fun profileUpdateSuccess() {
         hideProgressDialog()
