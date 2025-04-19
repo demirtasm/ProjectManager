@@ -4,11 +4,13 @@ import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.toObject
 import com.madkit.myapplication.activities.CreateBoardActivity
 import com.madkit.myapplication.activities.MainActivity
 import com.madkit.myapplication.activities.MyProfileActivity
 import com.madkit.myapplication.activities.SignInActivity
 import com.madkit.myapplication.activities.SignUpActivity
+import com.madkit.myapplication.activities.TaskListActivity
 import com.madkit.myapplication.models.Board
 import com.madkit.myapplication.models.User
 import com.madkit.myapplication.utils.Constants
@@ -47,6 +49,16 @@ class FirestoreClass {
         }
     }
 
+    fun getBoardDetails(activity: TaskListActivity, documentId:String){
+        mFireStore.collection(Constants.BOARDS).document(documentId).get().addOnSuccessListener { document->
+            val board = document.toObject(Board::class.java)!!
+            board.documentId = document.id
+            activity.boardDetails(board)
+        }.addOnFailureListener { exception->
+            activity.hideProgressDialog()
+
+        }
+    }
     fun loadUserData(activity: Activity, readBoardsList: Boolean = false){
         mFireStore.collection(Constants.USERS).document(getCurrentUserId()).get().addOnSuccessListener {document->
             val loggedInUser = document.toObject(User::class.java)!!
@@ -65,6 +77,14 @@ class FirestoreClass {
                 is MyProfileActivity->activity.hideProgressDialog()
             }
         }
+    }
+
+    fun addUpdateTakList(activity: TaskListActivity, board: Board){
+        val taskListHashMap = HashMap<String, Any>()
+        taskListHashMap[Constants.TASK_LIST] = board.taskList
+        mFireStore.collection(Constants.BOARDS).document(board.documentId).update(taskListHashMap).addOnSuccessListener {
+            activity.addUpdateTaskListSuccess()
+        }.addOnFailureListener { e-> activity.hideProgressDialog() }
     }
 
     fun getCurrentUserId(): String{

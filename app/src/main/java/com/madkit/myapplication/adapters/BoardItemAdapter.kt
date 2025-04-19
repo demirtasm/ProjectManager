@@ -48,6 +48,10 @@ open class BoardItemAdapter(private val context: Context, private val list: Arra
         fun onClick(position: Int, model:Board)
     }
 
+    fun setOnClickListener(onClickListener: OnClickListener){
+        this.onClickListener = onClickListener
+    }
+
     private class MyViewHolder(view: View) : RecyclerView.ViewHolder(view){
         val tvName : TextView = view.findViewById(R.id.tv_name)
         val tvCreatedBy : TextView = view.findViewById(R.id.tv_created_by)

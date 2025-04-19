@@ -36,12 +36,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private lateinit var tvNoBoards: TextView
     private lateinit var boardAdapter: BoardItemAdapter
 
-    companion object{
+    companion object {
         const val MY_PROFILE_REQUEST_CODE = 11
         const val CREATE_BOARD_REQUEST_CODE = 12
     }
 
-    private lateinit var mUserName:String
+    private lateinit var mUserName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,19 +68,28 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         FirestoreClass().loadUserData(this, true)
     }
 
-    fun populateBoardsListToUI(boardList: ArrayList<Board>){
+    fun populateBoardsListToUI(boardList: ArrayList<Board>) {
         hideProgressDialog()
-        if(boardList.size>0){
-            rvBoard.visibility= View.VISIBLE
+        if (boardList.size > 0) {
+            rvBoard.visibility = View.VISIBLE
             tvNoBoards.visibility = View.GONE
             rvBoard.layoutManager = LinearLayoutManager(this)
             rvBoard.setHasFixedSize(true)
-            boardAdapter= BoardItemAdapter(this, boardList)
+            boardAdapter = BoardItemAdapter(this, boardList)
             rvBoard.adapter = boardAdapter
 
-        }else{
+            boardAdapter.setOnClickListener(object : BoardItemAdapter.OnClickListener {
+                override fun onClick(position: Int, model: Board) {
+                    val intent = Intent(this@MainActivity, TaskListActivity::class.java)
+                    intent.putExtra(Constants.DOCUMENT_ID, model.documentId)
+                    startActivity(intent)
+                }
+
+            })
+
+        } else {
             tvNoBoards.visibility = View.VISIBLE
-            rvBoard.visibility= View.GONE
+            rvBoard.visibility = View.GONE
 
         }
     }
@@ -113,12 +122,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK && requestCode == MY_PROFILE_REQUEST_CODE){
+        if (resultCode == Activity.RESULT_OK && requestCode == MY_PROFILE_REQUEST_CODE) {
             FirestoreClass().loadUserData(this)
-        }else if(resultCode ==Activity.RESULT_OK && requestCode == CREATE_BOARD_REQUEST_CODE){
+        } else if (resultCode == Activity.RESULT_OK && requestCode == CREATE_BOARD_REQUEST_CODE) {
             FirestoreClass().getBoardsList(this)
-        } else{
-            Log.e("Cancelled","Cancelled")
+        } else {
+            Log.e("Cancelled", "Cancelled")
         }
     }
 
@@ -151,7 +160,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             .into(navUserImage)
 
         tvUserName.text = user.name
-        if(readBoardList){
+        if (readBoardList) {
             showProgressDialog(resources.getString(R.string.please_wait))
             FirestoreClass().getBoardsList(this)
         }
