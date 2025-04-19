@@ -13,6 +13,7 @@ import com.madkit.myapplication.databinding.ActivityMyProfileBinding
 import com.madkit.myapplication.databinding.ActivityTaskListBinding
 import com.madkit.myapplication.firebase.FirestoreClass
 import com.madkit.myapplication.models.Board
+import com.madkit.myapplication.models.Card
 import com.madkit.myapplication.models.Task
 import com.madkit.myapplication.utils.Constants
 
@@ -83,6 +84,19 @@ class TaskListActivity : BaseActivity() {
     fun deleteTasList(position: Int){
         mBoardDetails.taskList.removeAt(position)
         mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size -1)
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().addUpdateTakList(this, mBoardDetails)
+    }
+
+    fun addCardToTask(position: Int, cardName: String){
+        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size-1)
+        val cardAssignedUsersList: ArrayList<String> = ArrayList()
+        cardAssignedUsersList.add(FirestoreClass().getCurrentUserId())
+        val card = Card(cardName, FirestoreClass().getCurrentUserId(), cardAssignedUsersList)
+        val cardList = mBoardDetails.taskList[position].cards
+        cardList.add(card)
+        val task = Task(mBoardDetails.taskList[position].title, mBoardDetails.taskList[position].createdBy, cardList)
+        mBoardDetails.taskList[position] = task
         showProgressDialog(resources.getString(R.string.please_wait))
         FirestoreClass().addUpdateTakList(this, mBoardDetails)
     }

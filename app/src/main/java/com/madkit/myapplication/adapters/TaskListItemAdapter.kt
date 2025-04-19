@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.madkit.myapplication.R
 import com.madkit.myapplication.activities.TaskListActivity
@@ -87,6 +88,30 @@ class TaskListItemAdapter(private val context: Context, private var list: ArrayL
             holder.ibDeleteList.setOnClickListener {
                 alertDialogForDeleteList(position, model.title)
             }
+
+            holder.tvAddCard.setOnClickListener {
+                holder.tvAddCard.visibility = View.GONE
+                holder.cvAddCard.visibility = View.VISIBLE
+            }
+            holder.ibCloseCardName.setOnClickListener {
+                holder.tvAddCard.visibility = View.VISIBLE
+                holder.cvAddCard.visibility = View.GONE
+            }
+
+            holder.ibDoneCardName.setOnClickListener {
+                val cardName = holder.etCardName.text.toString()
+                if(cardName.isNotEmpty()){
+                    if(context is TaskListActivity){
+                        context.addCardToTask(position, cardName)
+                    }
+                }else {
+                    Toast.makeText(context, "Please Enter Card Name", Toast.LENGTH_SHORT).show()
+                }
+            }
+            holder.rvCardList.layoutManager = LinearLayoutManager(context)
+            holder.rvCardList.setHasFixedSize(true)
+            val adapter = CardListItemsAdapter(context, model.cards)
+            holder.rvCardList.adapter = adapter
         }
     }
 
@@ -127,6 +152,13 @@ class TaskListItemAdapter(private val context: Context, private var list: ArrayL
         var cvEditTasListName = view.findViewById<CardView>(R.id.cv_edit_task_list_name)
         var ibDoneEditListName = view.findViewById<ImageButton>(R.id.ib_done_edit_list_name)
         var ibDeleteList = view.findViewById<ImageButton>(R.id.ib_delete_list)
+        var tvAddCard = view.findViewById<TextView>(R.id.tv_add_card)
+        var cvAddCard = view.findViewById<CardView>(R.id.cv_add_card)
+        var ibCloseCardName = view.findViewById<ImageButton>(R.id.ib_close_card_name)
+        var ibDoneCardName = view.findViewById<ImageButton>(R.id.ib_done_card_name)
+        var etCardName = view.findViewById<EditText>(R.id.et_card_name)
+        var rvCardList = view.findViewById<RecyclerView>(R.id.rv_card_list)
+
 
     }
 }
