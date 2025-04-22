@@ -7,7 +7,7 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.madkit.myapplication.R
 import com.madkit.myapplication.adapters.MemberListItemAdapter
@@ -19,7 +19,8 @@ import com.madkit.myapplication.utils.Constants
 
 class MembersActivity : BaseActivity() {
     private lateinit var binding: ActivityMembersBinding
-    private lateinit var mBoardDetais: Board
+    private lateinit var mBoardDetails: Board
+    private lateinit var mAssignedMembersList: ArrayList<User>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,16 +28,17 @@ class MembersActivity : BaseActivity() {
         setContentView(binding.root)
         setUpActionBar()
         if (intent.hasExtra(Constants.BOARD_DETAIL)) {
-            mBoardDetais = intent.getParcelableExtra<Board>(Constants.BOARD_DETAIL)!!
+            mBoardDetails = intent.getParcelableExtra<Board>(Constants.BOARD_DETAIL)!!
             showProgressDialog(resources.getString(R.string.please_wait))
             FirestoreClass().getAssignedMemberListDetails(
                 this@MembersActivity,
-                mBoardDetais.assignedTo
+                mBoardDetails.assignedTo
             )
         }
     }
 
     fun setUpMemberList(list: ArrayList<User>) {
+        mAssignedMembersList = list
         hideProgressDialog()
         binding.rvMembersList.layoutManager = LinearLayoutManager(this)
         binding.rvMembersList.setHasFixedSize(true)
@@ -80,12 +82,17 @@ class MembersActivity : BaseActivity() {
         )
         dialog.setContentView(R.layout.dialog_search_member)
         dialog.findViewById<TextView>(R.id.tv_add).setOnClickListener {
-            val email = dialog.findViewById<EditText>(R.id.et_email).text.toString()
-            if(email.isNotEmpty()){
+            val email = dialog.findViewById<AppCompatEditText>(R.id.et_email_search_member).text.toString()
+            if (email.isNotEmpty()) {
                 dialog.dismiss()
-
-            }else{
-                Toast.makeText(this@MembersActivity, "Please enter email address", Toast.LENGTH_SHORT).show()
+                showProgressDialog(resources.getString(R.string.please_wait))
+                FirestoreClass().getMemberDetails(this, email)
+            } else {
+                Toast.makeText(
+                    this@MembersActivity,
+                    "Please enter email address",
+                    Toast.LENGTH_SHORT
+                ).show()
 
             }
         }
@@ -93,5 +100,18 @@ class MembersActivity : BaseActivity() {
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    fun memberDetails(user: User) {
+        mBoardDetails.assignedTo.add(
+            user.id
+        )
+        FirestoreClass().assignedMemberToBoard(this, mBoardDetails, user)
+    }
+
+    fun memberAssignedSuccess(user:User){
+        hideProgressDialog()
+        mAssignedMembersList.add(user)
+        setUpMemberList(mAssignedMembersList)
     }
 }

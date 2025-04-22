@@ -113,4 +113,25 @@ class FirestoreClass {
 
         }.addOnFailureListener { e-> activity.hideProgressDialog() }
     }
+
+    fun getMemberDetails(activity: MembersActivity, email: String){
+        mFireStore.collection(Constants.USERS).whereEqualTo(Constants.EMAIL, email).get().addOnSuccessListener {
+            document->
+            if(document.documents.size>0){
+                val user = document.documents[0].toObject(User::class.java)!!
+                activity.memberDetails(user)
+            }else{
+                activity.hideProgressDialog()
+                activity.showErrorSnackBar("No such member found")
+            }
+        }.addOnFailureListener { e-> activity.hideProgressDialog() }
+    }
+
+    fun assignedMemberToBoard(activity: MembersActivity, board:Board, user: User){
+        val assignedToHashMap = HashMap<String, Any>()
+        assignedToHashMap[Constants.ASSIGNED_TO] = board.assignedTo
+        mFireStore.collection(Constants.BOARDS).document(board.documentId).update(assignedToHashMap).addOnSuccessListener {
+            activity.memberAssignedSuccess(user)
+        }.addOnFailureListener { e-> activity.hideProgressDialog() }
+    }
 }
