@@ -4,9 +4,9 @@ import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.toObject
 import com.madkit.myapplication.activities.CreateBoardActivity
 import com.madkit.myapplication.activities.MainActivity
+import com.madkit.myapplication.activities.MembersActivity
 import com.madkit.myapplication.activities.MyProfileActivity
 import com.madkit.myapplication.activities.SignInActivity
 import com.madkit.myapplication.activities.SignUpActivity
@@ -99,6 +99,18 @@ class FirestoreClass {
     fun updateUserProfileData(activity: MyProfileActivity, userHashMap: HashMap<String, Any>){
         mFireStore.collection(Constants.USERS).document(getCurrentUserId()).update(userHashMap).addOnSuccessListener {
             activity.profileUpdateSuccess()
+        }.addOnFailureListener { e-> activity.hideProgressDialog() }
+    }
+
+    fun getAssignedMemberListDetails(activity:MembersActivity, assignedTo: ArrayList<String>){
+        mFireStore.collection(Constants.USERS).whereIn(Constants.ID, assignedTo).get().addOnSuccessListener {document->
+            val usersList: ArrayList<User> = ArrayList()
+            for(i in document.documents){
+                val user = i.toObject(User::class.java)!!
+                usersList.add(user)
+            }
+            activity.setUpMemberList(usersList)
+
         }.addOnFailureListener { e-> activity.hideProgressDialog() }
     }
 }
